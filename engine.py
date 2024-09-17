@@ -1,44 +1,47 @@
-# Import the Engine class
-from sensors_actuators.engine import Engine
+import logging
+import requests
+import frank_manager.bring_to_life
 
-# Instantiate the engine object
-engine = Engine()
+class Engine:
+    def __init__(self, api_url="http://192.168.1.12:8000/engine"):
+        self.api_url = api_url
+        self.d = 0.6
+        logging.debug(f"Engine class initialization")
 
-def control_motor():
-    while True:
-        print("\nMotor Control Options:")
-        print("1. Start Left Motor")
-        print("2. Start Right Motor")
-        print("3. Stop Left Motor")
-        print("4. Stop Right Motor")
-        print("5. Exit")
+    def _send_post_request(self, duty_cicle_lx: int, duty_cicle_rx: int):
+        payload = {
+            "duty_cicle_lx": duty_cicle_lx,
+            "duty_cicle_rx": duty_cicle_rx
+        }
+        try:
+            response = requests.post(self.api_url, json=payload)
+            response.raise_for_status()  # Raise an error for bad responses
+            logging.info(f"POST request sent successfully: {response.status_code}")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error sending POST request: {e}")
 
-        choice = input("Select an option: ")
+    def start_left(self, power_percentage: int):
+        duty_to_send = int(power_percentage * self.d)
+        frank_manager.bring_to_life.engine_left_queue.append(duty_to_send)
+        self._send_post_request(duty_cicle_lx=duty_to_send, duty_cicle_rx=self.get_right_duty())
 
-        if choice == '1':
-            power = int(input("Enter power percentage for left motor (-100 to 100): "))
-            engine.start_left(power)
-            print(f"Left motor started with {power}% power.")
-        
-        elif choice == '2':
-            power = int(input("Enter power percentage for right motor (-100 to 100): "))
-            engine.start_right(power)
-            print(f"Right motor started with {power}% power.")
-        
-        elif choice == '3':
-            engine.stop_left()
-            print("Left motor stopped.")
-        
-        elif choice == '4':
-            engine.stop_right()
-            print("Right motor stopped.")
-        
-        elif choice == '5':
-            print("Exiting motor control.")
-            break
-        
-        else:
-            print("Invalid option, please try again.")
+    def start_right(self, power_percentage: int):
+        duty_to_send = int(power_percentage * self.d)
+        frank_manager.bring_to_life.engine_right_queue.append(duty_to_send)
+        self._send_post_request(duty_cicle_lx=self.get_left_duty(), duty_cicle_rx=duty_to_send)
 
-if __name__ == "__main__":
-    control_motor()
+    def stop_left(self):
+        frank_manager.bring_to_life.engine_left_queue.append(0)
+        self._send_post_request(duty_cicle_lx=0, duty_cicle_rx=self.get_right_duty())
+
+    def stop_right(self):
+        frank_manager.bring_to_life.engine_right_queue.append(0)
+        self._send_post_request(duty_cicle_lx=self.get_left_duty(), duty_cicle_rx=0)
+
+    def get_left_duty(self):
+        # Returns the current duty cycle for the left motor
+        return frank_manager.bring_to_life.engine_left_queue[-1] if frank_manager.bring_to_life.engine_left_queue else 0
+
+    def get_right_duty(self):
+        # Returns the current duty cycle for the right motor
+        return frank_manager.bring_to_life.engine_right_queue[-1] if frank_manager.bring_to_life.engine_right_queue else 0
