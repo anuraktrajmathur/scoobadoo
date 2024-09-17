@@ -1,0 +1,74 @@
+frank:
+  root_folder: .
+  engine_lx_enable: true
+  engine_rx_enable: true
+  pump_enable: false
+  valve_enable: false
+  ultrasonic_sensor_btm: false
+  ultrasonic_sensor_front: false
+  camera_enable: true
+  web_api_enable: true
+
+
+queue_size:
+  proximity_sensor_front: 10
+  proximity_sensor_btm: 10
+  engine_left: 10
+  engine_right: 10
+  pump: 10
+  valve: 10
+  camera: 10
+  recognized_object: 10
+
+
+plot_enabled:
+  proximity_sensor_front: false
+  proximity_sensor_btm: false
+  engine_left: false
+  engine_right: false
+  pump: false
+  valve: false
+
+pinout:
+  l298n_engine_lx_in1 : 24
+  l298n_engine_lx_in2 : 25
+  l298n_engine_lx_ena : 12
+  l298n_engine_rx_in3 : 27
+  l298n_engine_rx_in4 : 22
+  l298n_engine_rx_enb : 13
+
+  l298n_pump_lx_in1 : 0
+  l298n_pump_lx_in2 : 0
+  l298n_pump_lx_ena : 0
+  l298n_pump_rx_in3 : 0
+  l298n_pump_rx_in4 : 0
+  l298n_pump_rx_enb : 0
+  pwm_frequency : 2000
+  
+
+  #//!@var ECHO1, GPIO number linked to sensor1's echo 
+  ultrasonic_sensor_btm_echo : 26
+  #//!@var TRIG1, GPIO number linked to sensor1's trigger
+  ultrasonic_sensor_btm_trig : 16
+  #//!@var ECHO2, GPIO number linked to sensor2's echo
+  ultrasonic_sensor_front_echo : 10
+  #//!@var TRIG1, GPIO number linked to sensor1's trigger
+  ultrasonic_sensor_front_trig : 9
+  
+engines_param:
+  l298n_engine_lx_ena_pwm_frequency : 1000
+  l298n_engine_rx_enb_pwm_frequency : 1000
+  temp1: 1
+
+pump_param:
+  l298n_pump_in_ena_pwm_frequency : 1500
+  l298n_pump_out_enb_pwm_frequency : 1500
+
+camera:
+  fps: 30
+  frame_with: 640
+  frame_height: 480
+
+physics_parameter:
+  sound_speed_in_air: 0.034 #[cm/us]
+  sound_speed_in_water: 0.1481 #[cm/us]
