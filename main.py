@@ -1,7 +1,7 @@
 import logging
 import time
-from frank_manager import bring_to_life
 import sys
+from frank_manager import bring_to_life
 from sensors_actuators.engine import Engine
 from sensors_actuators.proximity import Proximity
 from sensors_actuators.camera import RecognizedObject
@@ -27,16 +27,17 @@ def main():
     # control the engines
 
     while True:
-        logging.debug("main do somethings")
+        # Get user input to stop the loop
         user_input = input("Enter 0 to stop the loop: ")
+        sys.stdout.flush()  # Flush to ensure the input prompt is visible
+        
         if user_input == '0':
             logging.info("User requested to stop the loop.")
             break
+        
+        logging.debug("main do somethings")
         time.sleep(10)
 
 if __name__ == '__main__':
-
-    # logger = logging.getLogger(__name__)
-    # logging.basicConfig(filename='log.log', encoding='utf-8', level=logging.DEBUG)
     logging.basicConfig(level=logging.DEBUG)
     sys.exit(main())
